@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+
+  <classPathEntry location="D:\MAVEN REPOSITORY\mysql\mysql-connector-java\8.0.12\mysql-connector-java-8.0.12.jar"/>
+  
+  <!-- <context id="MySqlContext" targetRuntime="MyBatis3Simple" defaultModelType="flat"> -->
+  <context id="MySqlContext" targetRuntime="com.skych.fullsystem.mybatis.SkychMyBatis3SimpleImpl" defaultModelType="flat">
+    <!-- <connectionFactory/> -->
+    
+    <property name="beginningDelimiter" value="`"/>
+    <property name="endingDelimiter" value="`"/>
+    <property name="javaFileEncoding" value="UTF-8"/>
+    
+    <commentGenerator type="com.skych.fullsystem.mybatis.SkychCommentGenerator">
+        <property name="addRemarkComments" value="true"/>
+    </commentGenerator>
+    
+    <jdbcConnection
+        driverClass="com.mysql.cj.jdbc.Driver"
+        connectionURL="jdbc:mysql://10.206.19.227:3306/skych?nullCatalogMeansCurrent=true"
+        userId="root"
+        password="root123"/>
+    
+    <!-- 覆盖默认实现中将数据库的tinyint类型转为java的byte类型，修改后转成java的integer类型 -->
+    <javaTypeResolver type="com.skych.fullsystem.mybatis.SkychJavaTypeResolver"/>
+    
+    <javaModelGenerator targetPackage="com.skych.fullsystem.test.model" targetProject="fullsystem\src\main\java">
+        <property name="trimStrings" value="true"/>
+    </javaModelGenerator>
+    
+    <sqlMapGenerator targetPackage="com.skych.fullsystem.test.dao" targetProject="fullsystem\src\main\resources"/>
+    
+    <javaClientGenerator targetPackage="com.skych.fullsystem.test.dao" type="XMLMAPPER" targetProject="fullsystem\src\main\java"/>
+    
+    <table tableName="tbl_account" mapperName="{0}Dao" ><!-- mapperName="{0}Dao" -->
+        <generatedKey column="id" sqlStatement="MySql" identity="true" type="post"/>
+        <domainObjectRenamingRule searchString="^Tbl" replaceString=""/>
+    </table>
+    
+  </context>
+</generatorConfiguration>

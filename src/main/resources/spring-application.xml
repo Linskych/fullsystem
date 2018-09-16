@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 全局spring root容器，主要管理数据库、事务相关的beans。mvc相关的beans由dispatcherServlet里面的局部mvc容器管理 -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+    
+    <context:property-placeholder location="classpath:common.properties, classpath:jdbc.properties"/>
+    
+    <context:component-scan base-package="com.skych.fullsystem.service.impl"/>
+    
+    <!-- 数据源c3p0 -->
+    <bean id="dataSourceC3P0" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close"
+        p:driverClass="${jdbc.database.driverClass}"
+        p:jdbcUrl="${jdbc.database.jdbcUrl}"
+        p:user="${jdbc.database.user}"
+        p:password="${jdbc.database.password}"
+        
+        p:initialPoolSize="${jdbc.c3p0.initialPoolSize}"
+        p:minPoolSize="${jdbc.c3p0.minPoolSize}"
+        p:maxPoolSize="${jdbc.c3p0.maxPoolSize}"
+        p:acquireIncrement="${jdbc.c3p0.acquireIncrement}"
+        p:maxIdleTime="${jdbc.c3p0.maxIdleTime}"
+        p:idleConnectionTestPeriod="${jdbc.c3p0.idleConnectionTestPeriod}"
+        p:testConnectionOnCheckin="${jdbc.c3p0.testConnectionOnCheckin}"
+        p:testConnectionOnCheckout="${jdbc.c3p0.testConnectionOnCheckout}"
+        p:preferredTestQuery="${jdbc.c3p0.preferredTestQuery}"
+        p:acquireRetryAttempts="${jdbc.c3p0.acquireRetryAttempts}"
+        p:acquireRetryDelay="${jdbc.c3p0.acquireRetryDelay}"
+        p:breakAfterAcquireFailure="${jdbc.c3p0.breakAfterAcquireFailure}"/>
+        
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+        p:dataSource-ref="dataSourceC3P0"
+        p:typeAliasesPackage="com.skych.fullsystem.model"/>
+    
+    <!-- mybatis中的mapper -->
+    <mybatis-spring:scan base-package="com.skych.fullsystem.dao"/>
+
+</beans>
