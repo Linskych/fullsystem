@@ -39,7 +39,7 @@
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <!-- 用于启动web的IOC容器，加载并管理mvc相关的beans。如果value值为空，则不会管理具体的beans，获取bean时直接从父容器中取 -->
-            <param-value>classpath:web-application.xml</param-value>
+            <param-value></param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
