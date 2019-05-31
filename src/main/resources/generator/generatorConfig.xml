@@ -16,11 +16,16 @@
         <property name="addRemarkComments" value="true"/>
     </commentGenerator>
     
-    <jdbcConnection
+    <!-- <jdbcConnection
         driverClass="com.mysql.cj.jdbc.Driver"
         connectionURL="jdbc:mysql://10.206.19.227:3306/skych?nullCatalogMeansCurrent=true"
         userId="root"
-        password="root123"/>
+        password="root123"/> -->
+    <jdbcConnection
+        driverClass="com.mysql.jdbc.Driver"
+        connectionURL="jdbc:mysql://10.206.19.224:3306/cloud_shop_dev?nullCatalogMeansCurrent=true"
+        userId="cloud_shop"
+        password="nubia123"/>
     
     <!-- 覆盖默认实现中将数据库的tinyint类型转为java的byte类型，修改后转成java的integer类型 -->
     <javaTypeResolver type="com.skych.fullsystem.mybatis.SkychJavaTypeResolver"/>
@@ -33,9 +38,9 @@
     
     <javaClientGenerator targetPackage="com.skych.fullsystem.test.dao" type="XMLMAPPER" targetProject="fullsystem\src\main\java"/>
     
-    <table tableName="tbl_account" mapperName="{0}Dao" ><!-- mapperName="{0}Dao" -->
+    <table tableName="sys_user_customer_rel" mapperName="{0}Dao" ><!-- mapperName="{0}Dao" -->
         <generatedKey column="id" sqlStatement="MySql" identity="true" type="post"/>
-        <domainObjectRenamingRule searchString="^Tbl" replaceString=""/>
+        <!-- <domainObjectRenamingRule searchString="^Tbl" replaceString=""/> -->
     </table>
     
   </context>

@@ -9,19 +9,20 @@
     xmlns:mvc="http://www.springframework.org/schema/mvc"
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+    xmlns:tx="http://www.springframework.org/schema/tx"
     xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
 		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
     
-    <context:property-placeholder location="classpath:common.properties, classpath:jdbc.properties"/>
+    <context:property-placeholder location="classpath:jdbc.properties"/><!-- classpath:common.properties,  -->
     
     <context:component-scan base-package="com.skych.fullsystem.service.impl"/>
     
-    <!-- 数据源c3p0 -->
-    <bean id="dataSourceC3P0" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-        destroy-method="close"
+    <!-- 数据源c3p0。当时使用jdbc4和c3p0(0.95以上版本)时，可以不用设置连接检测机制 -->
+    <bean id="dataSourceC3P0" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close"
         p:driverClass="${jdbc.database.driverClass}"
         p:jdbcUrl="${jdbc.database.jdbcUrl}"
         p:user="${jdbc.database.user}"
@@ -40,11 +41,52 @@
         p:acquireRetryDelay="${jdbc.c3p0.acquireRetryDelay}"
         p:breakAfterAcquireFailure="${jdbc.c3p0.breakAfterAcquireFailure}"/>
         
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
-        p:dataSource-ref="dataSourceC3P0"
-        p:typeAliasesPackage="com.skych.fullsystem.model"/>
-    
+    <!-- mybatis配置 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSourceC3P0"/>
+        <property name="typeAliasesPackage" value="com.skych.fullsystem.model"/>
+        <property name="mapperLocations" value="classpath:com/skych/fullsystem/dao/*Dao.xml"/>
+        <!-- configuration有下面两种方式 -->
+        <!-- <property name="configLocation" value="classpath:mybatis-spring-config.xml"/> -->
+        <property name="configuration">
+            <bean class="org.apache.ibatis.session.Configuration">
+                <property name="aggressiveLazyLoading" value="false"/>            <!-- 延迟加载设置 -->
+                <property name="logImpl" value="LOG4J2"/>
+                <!-- <property name="mapUnderscoreToCamelCase" value="true"/> --> <!-- 自动下划线匹配驼峰 -->
+                <!-- <property name="cacheEnabled" value="true"/> -->             <!-- 二级缓存设置 -->
+                <!-- <property name="localCacheScope" value="STATEMENT"/> -->     <!-- 一级缓存作用域 -->
+            </bean>
+        </property>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+        p:basePackage="com.skych.fullsystem.dao"/>
     <!-- mybatis中的mapper -->
-    <mybatis-spring:scan base-package="com.skych.fullsystem.dao"/>
+    <!-- <mybatis-spring:scan base-package="com.skych.fullsystem.dao"/> -->
+    
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+        p:dataSource-ref="dataSourceC3P0"/>
+    
+    <tx:annotation-driven transaction-manager="transactionManager"/><!-- 启用@TransactionManager注解 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="remove*" propagation="REQUIRED"/>
+            
+            <tx:method name="list*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="count*" read-only="true"/>
+            <tx:method name="is*" read-only="true"/>
+            
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config proxy-target-class="true" expose-proxy="true">
+        <aop:pointcut expression="" id="txPointcut"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+    
 
 </beans>

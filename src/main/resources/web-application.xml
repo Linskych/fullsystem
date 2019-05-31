@@ -12,8 +12,25 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
 
     <mvc:annotation-driven/>
+    
     <context:component-scan base-package="com.skych.fullsystem.controller" use-default-filters="false">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
+    
+    <!-- 一般的jsp视图解析器配置 -->
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- jsp使用JSTL的国际化功能时的视图解析器配置 -->
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/view/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="maxUploadSize" value="102400000"/><!-- 10MB -->
+        <property name="maxInMemorySize" value="10240"/><!-- 默认值10k -->
+        <property name="maxUploadSizePerFile" value="20480000"/><!-- 单文件最大2MB -->
+        <!-- <property name="uploadTempDir" value=""/> --><!-- 上传文件的临时目录 -->
+    </bean>
 
 </beans>
