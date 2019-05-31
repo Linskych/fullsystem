@@ -21,7 +21,7 @@
     
     <context:component-scan base-package="com.skych.fullsystem.service.impl"/>
     
-    <!-- 数据源c3p0 -->
+    <!-- 数据源c3p0。当时使用jdbc4和c3p0(0.95以上版本)时，可以不用设置连接检测机制 -->
     <bean id="dataSourceC3P0" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close"
         p:driverClass="${jdbc.database.driverClass}"
         p:jdbcUrl="${jdbc.database.jdbcUrl}"
@@ -41,6 +41,7 @@
         p:acquireRetryDelay="${jdbc.c3p0.acquireRetryDelay}"
         p:breakAfterAcquireFailure="${jdbc.c3p0.breakAfterAcquireFailure}"/>
         
+    <!-- mybatis配置 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSourceC3P0"/>
         <property name="typeAliasesPackage" value="com.skych.fullsystem.model"/>
@@ -57,16 +58,35 @@
             </bean>
         </property>
     </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+        p:basePackage="com.skych.fullsystem.dao"/>
+    <!-- mybatis中的mapper -->
+    <!-- <mybatis-spring:scan base-package="com.skych.fullsystem.dao"/> -->
     
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
         p:dataSource-ref="dataSourceC3P0"/>
     
-    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/><!-- 启用@TransactionManager注解 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="remove*" propagation="REQUIRED"/>
+            
+            <tx:method name="list*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="count*" read-only="true"/>
+            <tx:method name="is*" read-only="true"/>
+            
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config proxy-target-class="true" expose-proxy="true">
+        <aop:pointcut expression="" id="txPointcut"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
     
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
-        p:basePackage="com.skych.fullsystem.dao"/>
-    
-    <!-- mybatis中的mapper -->
-    <!-- <mybatis-spring:scan base-package="com.skych.fullsystem.dao"/> -->
 
 </beans>
