@@ -51,7 +51,7 @@
     
     <version.shiro>1.4.0</version.shiro>
     
-    <version.gson>2.8.5</version.gson>
+    <version.gson>2.8.9</version.gson>
     <version.hutool>4.4.0</version.hutool>
   </properties>
   
