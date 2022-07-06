@@ -49,7 +49,7 @@
     
     <version.jstl>1.2</version.jstl>
     
-    <version.shiro>1.4.0</version.shiro>
+    <version.shiro>1.9.1</version.shiro>
     
     <version.gson>2.8.5</version.gson>
     <version.hutool>4.4.0</version.hutool>
